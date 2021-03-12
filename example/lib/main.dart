@@ -29,7 +29,7 @@ class ExampleApp extends StatefulWidget {
 class _ExampleAppState extends State<ExampleApp> {
   AudioCache audioCache = AudioCache();
   AudioPlayer advancedPlayer = AudioPlayer();
-  String localFilePath;
+  String? localFilePath;
 
   @override
   void initState() {
@@ -41,14 +41,14 @@ class _ExampleAppState extends State<ExampleApp> {
     }
     if (Platform.isIOS) {
       if (audioCache.fixedPlayer != null) {
-        audioCache.fixedPlayer.startHeadlessService();
+        audioCache.fixedPlayer!.startHeadlessService();
       }
       advancedPlayer.startHeadlessService();
     }
   }
 
   Future _loadFile() async {
-    final bytes = await readBytes(kUrl1);
+    final bytes = await readBytes(Uri.parse(kUrl1));
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/audio.mp3');
 
@@ -96,7 +96,7 @@ class _ExampleAppState extends State<ExampleApp> {
       localFilePath == null
           ? Container()
           : PlayerWidget(
-              url: localFilePath,
+              url: localFilePath!,
             ),
     ]);
   }
@@ -177,11 +177,10 @@ class _ExampleAppState extends State<ExampleApp> {
           case ConnectionState.done:
             if (snapshot.hasError) return Text('Error: ${snapshot.error}');
             return Text(
-              'audio2.mp3 duration is: ${Duration(milliseconds: snapshot.data)}',
+              'audio2.mp3 duration is: ${Duration(milliseconds: snapshot.data!)}',
             );
         }
-        return null; // unreachable
-      },
+       },
     );
   }
 
@@ -236,20 +235,20 @@ class _ExampleAppState extends State<ExampleApp> {
 }
 
 class Advanced extends StatefulWidget {
-  final AudioPlayer advancedPlayer;
+  final AudioPlayer? advancedPlayer;
 
-  const Advanced({Key key, this.advancedPlayer}) : super(key: key);
+  const Advanced({Key? key, this.advancedPlayer}) : super(key: key);
 
   @override
   _AdvancedState createState() => _AdvancedState();
 }
 
 class _AdvancedState extends State<Advanced> {
-  bool seekDone;
+  bool? seekDone;
 
   @override
   void initState() {
-    widget.advancedPlayer.seekCompleteHandler =
+    widget.advancedPlayer!.seekCompleteHandler =
         (finished) => setState(() => seekDone = finished);
     super.initState();
   }
@@ -266,15 +265,15 @@ class _AdvancedState extends State<Advanced> {
               Row(children: [
                 _Btn(
                   txt: 'Audio 1',
-                  onPressed: () => widget.advancedPlayer.setUrl(kUrl1),
+                  onPressed: () => widget.advancedPlayer!.setUrl(kUrl1),
                 ),
                 _Btn(
                   txt: 'Audio 2',
-                  onPressed: () => widget.advancedPlayer.setUrl(kUrl2),
+                  onPressed: () => widget.advancedPlayer!.setUrl(kUrl2),
                 ),
                 _Btn(
                   txt: 'Stream',
-                  onPressed: () => widget.advancedPlayer.setUrl(kUrl3),
+                  onPressed: () => widget.advancedPlayer!.setUrl(kUrl3),
                 ),
               ], mainAxisAlignment: MainAxisAlignment.spaceEvenly),
             ],
@@ -286,17 +285,17 @@ class _AdvancedState extends State<Advanced> {
                 _Btn(
                   txt: 'STOP',
                   onPressed: () =>
-                      widget.advancedPlayer.setReleaseMode(ReleaseMode.STOP),
+                      widget.advancedPlayer!.setReleaseMode(ReleaseMode.STOP),
                 ),
                 _Btn(
                   txt: 'LOOP',
                   onPressed: () =>
-                      widget.advancedPlayer.setReleaseMode(ReleaseMode.LOOP),
+                      widget.advancedPlayer!.setReleaseMode(ReleaseMode.LOOP),
                 ),
                 _Btn(
                   txt: 'RELEASE',
                   onPressed: () =>
-                      widget.advancedPlayer.setReleaseMode(ReleaseMode.RELEASE),
+                      widget.advancedPlayer!.setReleaseMode(ReleaseMode.RELEASE),
                 ),
               ], mainAxisAlignment: MainAxisAlignment.spaceEvenly),
             ],
@@ -308,7 +307,7 @@ class _AdvancedState extends State<Advanced> {
                 children: [0.0, 0.5, 1.0, 2.0].map((e) {
                   return _Btn(
                     txt: e.toString(),
-                    onPressed: () => widget.advancedPlayer.setVolume(e),
+                    onPressed: () => widget.advancedPlayer!.setVolume(e),
                   );
                 }).toList(),
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -322,19 +321,19 @@ class _AdvancedState extends State<Advanced> {
                 children: [
                   _Btn(
                     txt: 'resume',
-                    onPressed: () => widget.advancedPlayer.resume(),
+                    onPressed: () => widget.advancedPlayer!.resume(),
                   ),
                   _Btn(
                     txt: 'pause',
-                    onPressed: () => widget.advancedPlayer.pause(),
+                    onPressed: () => widget.advancedPlayer!.pause(),
                   ),
                   _Btn(
                     txt: 'stop',
-                    onPressed: () => widget.advancedPlayer.stop(),
+                    onPressed: () => widget.advancedPlayer!.stop(),
                   ),
                   _Btn(
                     txt: 'release',
-                    onPressed: () => widget.advancedPlayer.release(),
+                    onPressed: () => widget.advancedPlayer!.release(),
                   ),
                 ],
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -349,7 +348,7 @@ class _AdvancedState extends State<Advanced> {
                   _Btn(
                       txt: '100ms',
                       onPressed: () {
-                        widget.advancedPlayer.seek(
+                        widget.advancedPlayer!.seek(
                           Duration(
                             milliseconds: audioPosition.inMilliseconds + 100,
                           ),
@@ -359,7 +358,7 @@ class _AdvancedState extends State<Advanced> {
                   _Btn(
                       txt: '500ms',
                       onPressed: () {
-                        widget.advancedPlayer.seek(
+                        widget.advancedPlayer!.seek(
                           Duration(
                             milliseconds: audioPosition.inMilliseconds + 500,
                           ),
@@ -369,7 +368,7 @@ class _AdvancedState extends State<Advanced> {
                   _Btn(
                       txt: '1s',
                       onPressed: () {
-                        widget.advancedPlayer.seek(
+                        widget.advancedPlayer!.seek(
                           Duration(seconds: audioPosition.inSeconds + 1),
                         );
                         setState(() => seekDone = false);
@@ -377,7 +376,7 @@ class _AdvancedState extends State<Advanced> {
                   _Btn(
                       txt: '1.5s',
                       onPressed: () {
-                        widget.advancedPlayer.seek(
+                        widget.advancedPlayer!.seek(
                           Duration(
                             milliseconds: audioPosition.inMilliseconds + 1500,
                           ),
@@ -397,7 +396,7 @@ class _AdvancedState extends State<Advanced> {
                   return _Btn(
                     txt: e.toString(),
                     onPressed: () {
-                      widget.advancedPlayer.setPlaybackRate(playbackRate: e);
+                      widget.advancedPlayer!.setPlaybackRate(playbackRate: e);
                     },
                   );
                 }).toList(),
@@ -406,7 +405,7 @@ class _AdvancedState extends State<Advanced> {
             ],
           ),
           Text('Audio Position: ${audioPosition}'),
-          if (seekDone != null) Text(seekDone ? 'Seek Done' : 'Seeking...'),
+          if (seekDone != null) Text(seekDone! ? 'Seek Done' : 'Seeking...'),
         ],
       ),
     );
@@ -414,9 +413,9 @@ class _AdvancedState extends State<Advanced> {
 }
 
 class _Tab extends StatelessWidget {
-  final List<Widget> children;
+  final List<Widget>? children;
 
-  const _Tab({Key key, this.children}) : super(key: key);
+  const _Tab({Key? key, this.children}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -426,7 +425,7 @@ class _Tab extends StatelessWidget {
         padding: EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
-            children: children
+            children: children!
                 .map((w) => Container(child: w, padding: EdgeInsets.all(6.0)))
                 .toList(),
           ),
@@ -437,16 +436,16 @@ class _Tab extends StatelessWidget {
 }
 
 class _Btn extends StatelessWidget {
-  final String txt;
-  final VoidCallback onPressed;
+  final String? txt;
+  final VoidCallback? onPressed;
 
-  const _Btn({Key key, this.txt, this.onPressed}) : super(key: key);
+  const _Btn({Key? key, this.txt, this.onPressed}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ButtonTheme(
       minWidth: 48.0,
-      child: RaisedButton(child: Text(txt), onPressed: onPressed),
+      child: RaisedButton(child: Text(txt!), onPressed: onPressed),
     );
   }
 }
