@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 class WrappedPlayer {
-  double? pausedAt;
+  num? pausedAt;
   double currentVolume = 1.0;
   ReleaseMode currentReleaseMode = ReleaseMode.RELEASE;
   String? currentUrl;
@@ -50,7 +50,7 @@ class WrappedPlayer {
     player = null;
   }
 
-  void start(double position) {
+  void start(num position) {
     isPlaying = true;
     if (currentUrl == null) {
       return; // nothing to play yet
@@ -67,7 +67,7 @@ class WrappedPlayer {
   }
 
   void pause() {
-    pausedAt = player!.currentTime.toDouble();
+    pausedAt = player!.currentTime;
     _cancel();
   }
 

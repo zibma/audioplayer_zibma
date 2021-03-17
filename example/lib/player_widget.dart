@@ -224,11 +224,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
         ? _position
         : null;
     final result = await _audioPlayer!.play(widget.url!, position: playPosition);
+    print("result_play"+'${result}');
     if (result == 1) setState(() => _playerState = PlayerState.playing);
-
-    // default playback rate is 1.0
-    // this should be called after _audioPlayer.play() or _audioPlayer.resume()
-    // this can also be called everytime the user wants to change playback rate in the UI
     _audioPlayer!.setPlaybackRate(playbackRate: 1.0);
 
     return result;

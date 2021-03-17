@@ -119,7 +119,7 @@ void _backgroundCallbackDispatcher() {
 
     final Map<dynamic, dynamic> callArgs = call.arguments as Map;
     if (call.method == 'audio.onNotificationBackgroundPlayerStateChanged') {
-      // onAudioChangeBackgroundEvent ??= _performCallbackLookup();
+      onAudioChangeBackgroundEvent ?? _performCallbackLookup();
       final String playerState = callArgs['value'];
       if (playerState == 'playing') {
         onAudioChangeBackgroundEvent!(AudioPlayerState.PLAYING);
@@ -189,7 +189,7 @@ class AudioPlayer {
   set state(AudioPlayerState state) {
     _playerStateController.add(state);
     // ignore: deprecated_member_use_from_same_package
-    audioPlayerStateChangeHandler!.call(state);
+    audioPlayerStateChangeHandler?.call(state);
     _audioPlayerState = state;
   }
 
@@ -203,11 +203,11 @@ class AudioPlayer {
   }
 
   /// Stream of changes on player state.
-  Stream<AudioPlayerState>? get onPlayerStateChanged =>
+  Stream<AudioPlayerState> get onPlayerStateChanged =>
       _playerStateController.stream;
 
   /// Stream of changes on player state coming from notification area in iOS.
-  Stream<AudioPlayerState>? get onNotificationPlayerStateChanged =>
+  Stream<AudioPlayerState> get onNotificationPlayerStateChanged =>
       _notificationPlayerStateController.stream;
 
   /// Stream of changes on audio position.
@@ -216,13 +216,13 @@ class AudioPlayer {
   /// position of the playback if the status is [AudioPlayerState.PLAYING].
   ///
   /// You can use it on a progress bar, for instance.
-  Stream<Duration>? get onAudioPositionChanged => _positionController.stream;
+  Stream<Duration> get onAudioPositionChanged => _positionController.stream;
 
   /// Stream of changes on audio duration.
   ///
   /// An event is going to be sent as soon as the audio duration is available
   /// (it might take a while to download or buffer it).
-  Stream<Duration>? get onDurationChanged => _durationController.stream;
+  Stream<Duration> get onDurationChanged => _durationController.stream;
 
   /// Stream of player completions.
   ///
@@ -230,22 +230,22 @@ class AudioPlayer {
   /// sent when an audio is paused or stopped.
   ///
   /// [ReleaseMode.LOOP] also sends events to this stream.
-  Stream<void>? get onPlayerCompletion => _completionController.stream;
+  Stream<void> get onPlayerCompletion => _completionController.stream;
 
   /// Stream of seek completions.
   ///
   /// An event is going to be sent as soon as the audio seek is finished.
-  Stream<void>? get onSeekComplete => _seekCompleteController.stream;
+  Stream<void> get onSeekComplete => _seekCompleteController.stream;
 
   /// Stream of player errors.
   ///
   /// Events are sent when an unexpected error is thrown in the native code.
-  Stream<String>? get onPlayerError => _errorController.stream;
+  Stream<String> get onPlayerError => _errorController.stream;
 
   /// Stream of remote player command send by native side
   ///
   /// Events are sent user tap system remote control command.
-  Stream<PlayerControlCommand>? get onPlayerCommand => _commandController.stream;
+  Stream<PlayerControlCommand> get onPlayerCommand => _commandController.stream;
 
   /// Handler of changes on player state.
   @deprecated
@@ -260,7 +260,7 @@ class AudioPlayer {
   ///
   /// This is deprecated. Use [onAudioPositionChanged] instead.
   @deprecated
-  TimeChangeHandler? positionHandler;
+  late TimeChangeHandler positionHandler;
 
   /// Handler of changes on audio duration.
   ///
@@ -269,7 +269,7 @@ class AudioPlayer {
   ///
   /// This is deprecated. Use [onDurationChanged] instead.
   @deprecated
-  TimeChangeHandler? durationHandler;
+  late TimeChangeHandler durationHandler;
 
   /// Handler of player completions.
   ///
@@ -296,7 +296,7 @@ class AudioPlayer {
   ///
   /// This is deprecated. Use [onPlayerError] instead.
   @deprecated
-  ErrorHandler? errorHandler;
+  late ErrorHandler errorHandler;
 
   /// An unique ID generated for this instance of [AudioPlayer].
   ///
@@ -305,11 +305,11 @@ class AudioPlayer {
 
   /// Current mode of the audio player. Can be updated at any time, but is going
   /// to take effect only at the next time you play the audio.
-  PlayerMode? mode;
+  PlayerMode? mode ;
 
   /// Creates a new instance and assigns an unique id to it.
   AudioPlayer({this.mode = PlayerMode.MEDIA_PLAYER, this.playerId}) {
-    this.mode ??= PlayerMode.MEDIA_PLAYER;
+    this.mode ;
     this.playerId ??= _uuid.v4();
     players[playerId!] = this;
 
@@ -397,19 +397,19 @@ class AudioPlayer {
     bool recordingActive = false,
   }) async {
     isLocal ??= isLocalUrl(url);
-    volume ??= 1.0;
-    respectSilence ??= false;
-    stayAwake ??= false;
+    volume ;
+    respectSilence ;
+    stayAwake ;
 
     final int result = await _invokeMethod('play', {
       'url': url,
       'isLocal': isLocal,
       'volume': volume,
       'position': position?.inMilliseconds,
-      'respectSilence': respectSilence ?? false,
-      'stayAwake': stayAwake ?? false,
-      'duckAudio': duckAudio ?? false,
-      'recordingActive': recordingActive ?? false,
+      'respectSilence': respectSilence ,
+      'stayAwake': stayAwake ,
+      'duckAudio': duckAudio ,
+      'recordingActive': recordingActive ,
     });
 
     if (result == 1) {
@@ -432,9 +432,9 @@ class AudioPlayer {
     bool duckAudio = false,
     bool recordingActive = false,
   }) async {
-    volume ??= 1.0;
-    respectSilence ??= false;
-    stayAwake ??= false;
+    volume;
+    respectSilence ;
+    stayAwake;
 
     if (!Platform.isAndroid) {
       throw PlatformException(
@@ -610,7 +610,7 @@ class AudioPlayer {
     return _invokeMethod('getCurrentPosition');
   }
 
-  static Future<void> platformCallHandler(MethodCall call) async {
+  static Future platformCallHandler(MethodCall call) async {
     try {
       _doHandlePlatformCall(call);
     } catch (ex) {
@@ -618,7 +618,7 @@ class AudioPlayer {
     }
   }
 
-  static Future<void> _doHandlePlatformCall(MethodCall call) async {
+  static Future? _doHandlePlatformCall(MethodCall call) async {
     final Map<dynamic, dynamic> callArgs = call.arguments as Map;
     _log('_platformCallHandler call ${call.method} $callArgs');
 
@@ -646,30 +646,30 @@ class AudioPlayer {
         Duration newDuration = Duration(milliseconds: value);
         player._durationController.add(newDuration);
         // ignore: deprecated_member_use_from_same_package
-        player.durationHandler?.call(newDuration);
+        player.durationHandler.call(newDuration);
         break;
       case 'audio.onCurrentPosition':
         Duration newDuration = Duration(milliseconds: value);
         player._positionController.add(newDuration);
         // ignore: deprecated_member_use_from_same_package
-        player.positionHandler?.call(newDuration);
+        player.positionHandler.call(newDuration);
         break;
       case 'audio.onComplete':
         player.state = AudioPlayerState.COMPLETED;
         player._completionController.add(null);
         // ignore: deprecated_member_use_from_same_package
-        player.completionHandler?.call();
+        player.completionHandler!.call();
         break;
       case 'audio.onSeekComplete':
         player._seekCompleteController.add(value);
         // ignore: deprecated_member_use_from_same_package
-        player.seekCompleteHandler?.call(value);
+        player.seekCompleteHandler!.call(value);
         break;
       case 'audio.onError':
         player.state = AudioPlayerState.STOPPED;
         player._errorController.add(value);
         // ignore: deprecated_member_use_from_same_package
-        player.errorHandler?.call(value);
+        player.errorHandler.call(value);
         break;
       case 'audio.onGotNextTrackCommand':
         player._commandController.add(PlayerControlCommand.NEXT_TRACK);

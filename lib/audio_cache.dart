@@ -85,18 +85,18 @@ class AudioCache {
   /// Loads all the [fileNames] provided to the cache.
   ///
   /// Also returns a list of [Future]s for those files.
-  Future<List<File>> loadAll(List<String> fileNames) async {
+  Future<List<File?>> loadAll(List<String> fileNames) async {
     return Future.wait(fileNames.map(load));
   }
 
   /// Loads a single [fileName] to the cache.
   ///
   /// Also returns a [Future] to access that file.
-  Future<File> load(String fileName) async {
+  Future<File?> load(String fileName) async {
     if (!loadedFiles.containsKey(fileName)) {
       loadedFiles[fileName] = await fetchToMemory(fileName);
     }
-    return loadedFiles[fileName]!;
+    return loadedFiles[fileName];
   }
 
   AudioPlayer _player(PlayerMode mode) {
@@ -189,7 +189,7 @@ class AudioCache {
     if (kIsWeb) {
       return 'assets/$prefix$fileName';
     }
-    File file = await load(fileName);
+    File file = (await load(fileName))!;
     return file.path;
   }
 }
