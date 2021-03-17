@@ -259,8 +259,7 @@ class AudioPlayer {
   /// You can use it on a progress bar, for instance.
   ///
   /// This is deprecated. Use [onAudioPositionChanged] instead.
-  @deprecated
-  late TimeChangeHandler positionHandler;
+  late  TimeChangeHandler positionHandler;
 
   /// Handler of changes on audio duration.
   ///
@@ -268,8 +267,7 @@ class AudioPlayer {
   /// (it might take a while to download or buffer it).
   ///
   /// This is deprecated. Use [onDurationChanged] instead.
-  @deprecated
-  late TimeChangeHandler durationHandler;
+   late TimeChangeHandler durationHandler;
 
   /// Handler of player completions.
   ///
@@ -645,8 +643,7 @@ class AudioPlayer {
       case 'audio.onDuration':
         Duration newDuration = Duration(milliseconds: value);
         player._durationController.add(newDuration);
-        // ignore: deprecated_member_use_from_same_package
-        player.durationHandler.call(newDuration);
+         player.durationHandler.call(newDuration);
         break;
       case 'audio.onCurrentPosition':
         Duration newDuration = Duration(milliseconds: value);

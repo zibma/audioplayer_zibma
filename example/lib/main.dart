@@ -111,7 +111,7 @@ class _ExampleAppState extends State<ExampleApp> {
           txt: 'Play',
           onPressed: () async {
             var bytes =
-                await (await audioCache.load('audio.mp3')).readAsBytes();
+                await (await audioCache.load('audio.mp3'))!.readAsBytes();
             audioCache.playBytes(bytes);
           },
         ),
@@ -122,7 +122,7 @@ class _ExampleAppState extends State<ExampleApp> {
           txt: 'Loop',
           onPressed: () async {
             var bytes =
-                await (await audioCache.load('audio.mp3')).readAsBytes();
+                await (await audioCache.load('audio.mp3'))!.readAsBytes();
             audioCache.playBytes(bytes, loop: true);
           },
         ),
@@ -153,7 +153,7 @@ class _ExampleAppState extends State<ExampleApp> {
   }
 
   Future<int> _getDuration() async {
-    File audiofile = await audioCache.load('audio2.mp3');
+    File audiofile = (await audioCache.load('audio2.mp3'))!;
     await advancedPlayer.setUrl(
       audiofile.path,
     );
@@ -180,7 +180,8 @@ class _ExampleAppState extends State<ExampleApp> {
               'audio2.mp3 duration is: ${Duration(milliseconds: snapshot.data!)}',
             );
         }
-       },
+      // unreachable
+      },
     );
   }
 

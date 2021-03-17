@@ -8,22 +8,22 @@ enum PlayerState { stopped, playing, paused }
 enum PlayingRouteState { speakers, earpiece }
 
 class PlayerWidget extends StatefulWidget {
-  final String? url;
-  final PlayerMode? mode;
+  final String url;
+  final PlayerMode mode;
 
   PlayerWidget(
-      {Key? key, @required this.url, this.mode = PlayerMode.MEDIA_PLAYER})
+      {Key? key, required this.url, this.mode = PlayerMode.MEDIA_PLAYER})
       : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _PlayerWidgetState();
+    return _PlayerWidgetState(url, mode);
   }
 }
 
 class _PlayerWidgetState extends State<PlayerWidget> {
-  // String url;
-  // PlayerMode mode;
+  String url;
+  PlayerMode mode;
 
   AudioPlayer? _audioPlayer;
   AudioPlayerState? _audioPlayerState;
@@ -40,17 +40,14 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   StreamSubscription<PlayerControlCommand>? _playerControlCommandSubscription;
 
   get _isPlaying => _playerState == PlayerState.playing;
-
   get _isPaused => _playerState == PlayerState.paused;
-
-  get _durationText => _duration?.toString()?.split('.')?.first ?? '';
-
-  get _positionText => _position?.toString()?.split('.')?.first ?? '';
+  get _durationText => _duration.toString().split('.').first ;
+  get _positionText => _position.toString().split('.').first ;
 
   get _isPlayingThroughEarpiece =>
       _playingRouteState == PlayingRouteState.earpiece;
 
-  // _PlayerWidgetState(this.url, this.mode);
+  _PlayerWidgetState(this.url, this.mode);
 
   @override
   void initState() {
@@ -123,9 +120,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           .seek(Duration(milliseconds: Position.round()));
                     },
                     value: (_position != null &&
-                            _duration != null &&
-                            _position!.inMilliseconds > 0 &&
-                            _position!.inMilliseconds < _duration!.inMilliseconds)
+                        _duration != null &&
+                        _position!.inMilliseconds > 0 &&
+                        _position!.inMilliseconds < _duration!.inMilliseconds)
                         ? _position!.inMilliseconds / _duration!.inMilliseconds
                         : 0.0,
                   ),
@@ -136,8 +133,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
               _position != null
                   ? '${_positionText ?? ''} / ${_durationText ?? ''}'
                   : _duration != null
-                      ? _durationText
-                      : '',
+                  ? _durationText
+                  : '',
               style: TextStyle(fontSize: 24.0),
             ),
           ],
@@ -148,9 +145,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   }
 
   void _initAudioPlayer() {
-    _audioPlayer = AudioPlayer(mode: widget.mode!);
+    _audioPlayer = AudioPlayer(mode: mode);
 
-    _durationSubscription = _audioPlayer!.onDurationChanged!.listen((duration) {
+    _durationSubscription = _audioPlayer!.onDurationChanged.listen((duration) {
       setState(() => _duration = duration);
 
       // TODO implemented for iOS, waiting for android impl
@@ -175,19 +172,19 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     });
 
     _positionSubscription =
-        _audioPlayer!.onAudioPositionChanged!.listen((p) => setState(() {
-              _position = p;
-            }));
+        _audioPlayer!.onAudioPositionChanged.listen((p) => setState(() {
+          _position = p;
+        }));
 
     _playerCompleteSubscription =
-        _audioPlayer!.onPlayerCompletion!.listen((event) {
-      _onComplete();
-      setState(() {
-        _position = _duration;
-      });
-    });
+        _audioPlayer!.onPlayerCompletion.listen((event) {
+          _onComplete();
+          setState(() {
+            _position = _duration;
+          });
+        });
 
-    _playerErrorSubscription = _audioPlayer!.onPlayerError!.listen((msg) {
+    _playerErrorSubscription = _audioPlayer!.onPlayerError.listen((msg) {
       print('audioPlayer error : $msg');
       setState(() {
         _playerState = PlayerState.stopped;
@@ -197,18 +194,18 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     });
 
     _playerControlCommandSubscription =
-        _audioPlayer!.onPlayerCommand!.listen((command) {
-      print('command');
-    });
+        _audioPlayer!.onPlayerCommand.listen((command) {
+          print('command');
+        });
 
-    _audioPlayer!.onPlayerStateChanged!.listen((state) {
+    _audioPlayer!.onPlayerStateChanged.listen((state) {
       if (!mounted) return;
       setState(() {
         _audioPlayerState = state;
       });
     });
 
-    _audioPlayer!.onNotificationPlayerStateChanged!.listen((state) {
+    _audioPlayer!.onNotificationPlayerStateChanged.listen((state) {
       if (!mounted) return;
       setState(() => _audioPlayerState = state);
     });
@@ -218,14 +215,17 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   Future<int> _play() async {
     final playPosition = (_position != null &&
-            _duration != null &&
-            _position!.inMilliseconds > 0 &&
-            _position!.inMilliseconds < _duration!.inMilliseconds)
+        _duration != null &&
+        _position!.inMilliseconds > 0 &&
+        _position!.inMilliseconds < _duration!.inMilliseconds)
         ? _position
         : null;
-    final result = await _audioPlayer!.play(widget.url!, position: playPosition);
-    print("result_play"+'${result}');
+    final result = await _audioPlayer!.play(url, position: playPosition);
     if (result == 1) setState(() => _playerState = PlayerState.playing);
+
+    // default playback rate is 1.0
+    // this should be called after _audioPlayer.play() or _audioPlayer.resume()
+    // this can also be called everytime the user wants to change playback rate in the UI
     _audioPlayer!.setPlaybackRate(playbackRate: 1.0);
 
     return result;
@@ -241,9 +241,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     final result = await _audioPlayer!.earpieceOrSpeakersToggle();
     if (result == 1)
       setState(() => _playingRouteState =
-          _playingRouteState == PlayingRouteState.speakers
-              ? PlayingRouteState.earpiece
-              : PlayingRouteState.speakers);
+      _playingRouteState == PlayingRouteState.speakers
+          ? PlayingRouteState.earpiece
+          : PlayingRouteState.speakers);
     return result;
   }
 
